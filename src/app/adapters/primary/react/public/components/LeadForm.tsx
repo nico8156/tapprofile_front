@@ -1,47 +1,59 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/app/components/ui/Button";
 import { Input } from "@/app/components/ui/Input";
-import { useState } from "react";
 
 type Props = {
-	ctaLabel: string;
-	onSubmit: (input: { name: string; email: string }) => Promise<unknown>;
-	success: boolean;
-	error: string;
+  onSubmit: (input: { firstName: string; email: string; message: string }) => Promise<unknown>;
+  success: boolean;
+  error: string;
 };
 
-export function LeadForm({ ctaLabel, onSubmit, success, error }: Props) {
-	const [name, setName] = useState("");
-	const [email, setEmail] = useState("");
-	const [submitting, setSubmitting] = useState(false);
+export function LeadForm({ onSubmit, success, error }: Props) {
+  const [firstName, setFirstName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setSubmitting(true);
-		await onSubmit({ name, email });
-		setSubmitting(false);
-	};
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    const result = await onSubmit({ firstName, email, message });
+    setSubmitting(false);
 
-	return (
-		<form className="space-y-3" onSubmit={handleSubmit}>
-			<Input
-				placeholder="Ton prénom"
-				value={name}
-				onChange={(e) => setName(e.target.value)}
-			/>
-			<Input
-				type="email"
-				placeholder="Ton email"
-				value={email}
-				onChange={(e) => setEmail(e.target.value)}
-			/>
-			<Button type="submit" disabled={submitting}>
-				{submitting ? "Envoi..." : ctaLabel}
-			</Button>
+    if ((result as { ok?: boolean })?.ok) {
+      setFirstName("");
+      setEmail("");
+      setMessage("");
+    }
+  };
 
-			{success ? <p className="text-sm text-green-600">Merci, c’est envoyé.</p> : null}
-			{error ? <p className="text-sm text-red-600">{error}</p> : null}
-		</form>
-	);
+  return (
+    <form className="space-y-3" onSubmit={handleSubmit}>
+      <Input
+        placeholder="Ton prénom"
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+      />
+      <Input
+        type="email"
+        placeholder="Ton email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <textarea
+        className="min-h-28 w-full rounded-xl border border-neutral-300 px-4 py-3 text-sm outline-none"
+        placeholder="Ton message (optionnel)"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+      />
+      <Button type="submit" disabled={submitting}>
+        {submitting ? "Envoi..." : "Me contacter"}
+      </Button>
+
+      {success ? <p className="text-sm text-green-600">Merci, ton message a bien été envoyé.</p> : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+    </form>
+  );
 }

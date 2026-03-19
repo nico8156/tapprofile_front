@@ -1,80 +1,98 @@
 "use client";
 
+import { useEffect, useMemo, useRef, useState } from "react";
 import { HttpTapProfileGateway } from "@/app/adapters/secondary/gateways/HttpTapProfileGateway";
-import { captureLead } from "@/app/core-logic/tap-profile/usecases/captureLead";
 import { loadPublicProfile } from "@/app/core-logic/tap-profile/usecases/loadPublicProfile";
+import { captureLead } from "@/app/core-logic/tap-profile/usecases/captureLead";
 import { registerView } from "@/app/core-logic/tap-profile/usecases/registerView";
-import { useEffect, useMemo, useState } from "react";
 
 export function usePublicProfileVM(slug: string) {
-	const gateway = useMemo(() => new HttpTapProfileGateway(), []);
-	const [state, setState] = useState({
-		loading: true,
-		error: "",
-		profile: null as null | {
-			id: string;
-			slug: string;
-			displayName: string;
-			headline: string;
-			bio: string;
-			ctaLabel: string;
-		},
-		leadSuccess: false,
-		leadError: "",
-	});
+  const gateway = useMemo(() => new HttpTapProfileGateway(), []);
+  const didTrackRef = useRef(false);
 
-	useEffect(() => {
-		let active = true;
+  const [state, setState] = useState({
+    loading: true,
+    error: "",
+    profile: null as null | {
+      profileId: string;
+      slug: string;
+      displayName: string;
+      headline: string;
+      bio: string;
+      publishedAt: string;
+    },
+    leadSuccess: false,
+    leadError: "",
+  });
 
-		(async () => {
-			const result = await loadPublicProfile(gateway)(slug);
-			if (!active) return;
+  useEffect(() => {
+    let active = true;
 
-			if (!result.ok) {
-				setState((prev) => ({ ...prev, loading: false, error: result.error }));
-				return;
-			}
+    (async () => {
+      const result = await loadPublicProfile(gateway)(slug);
+      if (!active) return;
 
-			setState((prev) => ({
-				...prev,
-				loading: false,
-				profile: result.value,
-				error: "",
-			}));
-		})();
+      if (!result.ok) {
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          error:
+            result.error === "PROFILE_NOT_FOUND" || result.error === "PROFILE_NOT_PUBLISHED"
+              ? "Profil introuvable."
+              : "Une erreur est survenue.",
+        }));
+        return;
+      }
 
-		return () => {
-			active = false;
-		};
-	}, [gateway, slug]);
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+        profile: result.value,
+        error: "",
+      }));
 
-	const trackView = async () => {
-		await registerView(gateway)(slug);
-	};
+      if (!didTrackRef.current) {
+        didTrackRef.current = true;
+        void registerView(gateway)(slug);
+      }
+    })();
 
-	const submitLead = async (input: { name: string; email: string }) => {
-		const result = await captureLead(gateway)({ slug, ...input });
+    return () => {
+      active = false;
+    };
+  }, [gateway, slug]);
 
-		if (!result.ok) {
-			setState((prev) => ({
-				...prev,
-				leadSuccess: false,
-				leadError: result.error,
-			}));
-			return result;
-		}
+  const submitLead = async (input: { firstName: string; email: string; message: string }) => {
+    const result = await captureLead(gateway)({ slug, ...input });
 
-		setState((prev) => ({
-			...prev,
-			leadSuccess: true,
-			leadError: "",
-		}));
-		return result;
-	};
+    if (!result.ok) {
+      let leadError = "Une erreur est survenue.";
 
-	return {
-		...state,
-		trackView,
-		submitLead,
-	};
+      if (result.error === "INVALID_FIRST_NAME") leadError = "Le prénom est requis.";
+      if (result.error === "INVALID_EMAIL") leadError = "L'email est invalide.";
+      if (result.error === "PROFILE_NOT_FOUND" || result.error === "PROFILE_NOT_PUBLISHED") {
+        leadError = "Profil introuvable.";
+      }
+
+      setState((prev) => ({
+        ...prev,
+        leadSuccess: false,
+        leadError,
+      }));
+      return result;
+    }
+
+    setState((prev) => ({
+      ...prev,
+      leadSuccess: true,
+      leadError: "",
+    }));
+
+    return result;
+  };
+
+  return {
+    ...state,
+    submitLead,
+  };
 }
