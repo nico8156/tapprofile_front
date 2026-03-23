@@ -92,24 +92,19 @@ describe("HttpTapProfileGateway", () => {
 						status: "PUBLISHED",
 						role: "EXHIBITOR",
 					},
-					badge: {
-						badgeToken: "badge-1",
-						publicBadgeUrl: "https://tap.profile/b/badge-1",
-					},
 					metrics: {
+						viewCount: 15,
 						scanCount: 12,
+						leadCount: 3,
 						connectionCount: 9,
+						conversionRate: 0.75,
 					},
-					recentConnections: [
+					recentLeads: [
 						{
-							connectionId: "connection-1",
-							connectedProfile: {
-								profileId: "profile-2",
-								slug: "nina-ross",
-								displayName: "Nina Ross",
-								headline: "Product designer",
-								role: "VISITOR",
-							},
+							leadId: "lead-1",
+							firstName: "Nina",
+							email: "nina@example.com",
+							message: "Lets talk soon",
 							createdAt: "2026-03-21T10:00:00Z",
 						},
 					],
@@ -131,24 +126,19 @@ describe("HttpTapProfileGateway", () => {
 					status: "PUBLISHED",
 					role: "EXHIBITOR",
 				},
-				badge: {
-					badgeToken: "badge-1",
-					publicBadgeUrl: "https://tap.profile/b/badge-1",
-				},
 				metrics: {
+					viewCount: 15,
 					scanCount: 12,
+					leadCount: 3,
 					connectionCount: 9,
+					conversionRate: 0.75,
 				},
-				recentConnections: [
+				recentLeads: [
 					{
-						connectionId: "connection-1",
-						connectedProfile: {
-							profileId: "profile-2",
-							slug: "nina-ross",
-							displayName: "Nina Ross",
-							headline: "Product designer",
-							role: "VISITOR",
-						},
+						leadId: "lead-1",
+						firstName: "Nina",
+						email: "nina@example.com",
+						message: "Lets talk soon",
 						createdAt: "2026-03-21T10:00:00Z",
 					},
 				],

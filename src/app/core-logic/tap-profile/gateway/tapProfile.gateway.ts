@@ -51,7 +51,17 @@ export interface TapProfileGateway {
 					slug: string;
 					displayName: string;
 				};
-				connections: OwnerDashboard["recentConnections"];
+				connections: Array<{
+					connectionId: string;
+					connectedProfile: {
+						profileId: string;
+						slug: string;
+						displayName: string;
+						headline: string;
+						role: "EXHIBITOR" | "VISITOR";
+					};
+					createdAt: string;
+				}>;
 			},
 			"PROFILE_NOT_FOUND" | "UNKNOWN_ERROR"
 		>
