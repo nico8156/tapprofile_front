@@ -4,17 +4,25 @@ export type OwnerDashboard = {
     slug: string;
     displayName: string;
     status: "DRAFT" | "PUBLISHED";
+    role: "EXHIBITOR" | "VISITOR";
+  };
+  badge: {
+    badgeToken: string;
+    publicBadgeUrl: string;
   };
   metrics: {
-    viewCount: number;
-    leadCount: number;
-    conversionRate: number;
+    scanCount: number;
+    connectionCount: number;
   };
-  recentLeads: Array<{
-    leadId: string;
-    firstName: string;
-    email: string;
-    message: string;
+  recentConnections: Array<{
+    connectionId: string;
+    connectedProfile: {
+      profileId: string;
+      slug: string;
+      displayName: string;
+      headline: string;
+      role: "EXHIBITOR" | "VISITOR";
+    };
     createdAt: string;
   }>;
 };

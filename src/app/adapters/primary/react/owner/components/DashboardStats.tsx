@@ -1,17 +1,15 @@
 import { Stat } from "@/app/components/ui/Stat";
 
 type Props = {
-  views: number;
-  leads: number;
-  conversionRate: number;
+  scans: number;
+  connections: number;
 };
 
-export function DashboardStats({ views, leads, conversionRate }: Props) {
+export function DashboardStats({ scans, connections }: Props) {
   return (
-    <div className="grid grid-cols-3 gap-3">
-      <Stat label="Views" value={views} />
-      <Stat label="Leads" value={leads} />
-      <Stat label="Conv." value={`${conversionRate}%`} />
+    <div className="grid grid-cols-2 gap-3">
+      <Stat label="Scans" value={scans} />
+      <Stat label="Contacts" value={connections} />
     </div>
   );
 }

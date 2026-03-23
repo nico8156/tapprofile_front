@@ -10,11 +10,12 @@ describe("captureLead", () => {
 
 		const result = await captureLead(gateway)({
 			slug: "john-doe",
-			name: "   ",
+			firstName: "   ",
 			email: "john@mail.com",
+			message: "",
 		});
 
-		expect(result).toEqual({ ok: false, error: "INVALID_NAME" });
+		expect(result).toEqual({ ok: false, error: "INVALID_FIRST_NAME" });
 		expect(gateway.captureLead).not.toHaveBeenCalled();
 	});
 
@@ -25,8 +26,9 @@ describe("captureLead", () => {
 
 		const result = await captureLead(gateway)({
 			slug: "john-doe",
-			name: "John",
+			firstName: "John",
 			email: "bad-email",
+			message: "",
 		});
 
 		expect(result).toEqual({ ok: false, error: "INVALID_EMAIL" });
@@ -40,14 +42,16 @@ describe("captureLead", () => {
 
 		const result = await captureLead(gateway)({
 			slug: "john-doe",
-			name: " John ",
+			firstName: " John ",
 			email: "JOHN@MAIL.COM ",
+			message: " Hello ",
 		});
 
 		expect(gateway.captureLead).toHaveBeenCalledWith({
 			slug: "john-doe",
-			name: "John",
+			firstName: "John",
 			email: "john@mail.com",
+			message: "Hello",
 		});
 		expect(result).toEqual({ ok: true, value: { leadId: "lead-1" } });
 	});

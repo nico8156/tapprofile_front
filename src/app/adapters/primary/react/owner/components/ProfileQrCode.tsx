@@ -16,5 +16,5 @@ export function ProfileQrCode({ url }: Props) {
 
   if (!src) return <div>QR code...</div>;
 
-  return <img src={src} alt="QR code du profil" className="h-40 w-40 rounded-xl border" />;
+  return <img src={src} alt="QR code du badge" className="h-56 w-56 rounded-2xl border" />;
 }
