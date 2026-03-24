@@ -71,7 +71,8 @@ export function OwnerDashboardPage({ profileId }: Props) {
                 <ProfileQrCode url={badgeUrl} />
                 <div className="w-full space-y-2 text-center">
                   <div className="text-sm font-medium">Votre badge</div>
-                  <p className="text-sm text-neutral-500">Scannez ce QR code pour echanger vos contacts.</p>
+                  <p className="text-sm text-neutral-700">Montrez ce badge pour etre scanne</p>
+                  <p className="text-xs text-neutral-500">Votre lien d&apos;acces vous a ete envoye</p>
                 </div>
               </>
             ) : (
