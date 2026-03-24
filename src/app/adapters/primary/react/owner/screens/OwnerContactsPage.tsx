@@ -16,7 +16,6 @@ function formatConnectionDate(value: string) {
 
 	return new Intl.DateTimeFormat("fr-FR", {
 		dateStyle: "medium",
-		timeStyle: "short",
 	}).format(date);
 }
 
@@ -37,13 +36,13 @@ export function OwnerContactsPage({ profileId }: Props) {
 				<Link className="text-sm text-neutral-500 underline" href={`/dashboard/${profileId}`}>
 					Retour au dashboard
 				</Link>
-				<h1 className="text-2xl font-bold">Mes connexions</h1>
-				<p className="text-sm text-neutral-600">Retrouvez tous les contacts scannes pendant l&apos;evenement.</p>
+				<h1 className="text-2xl font-bold">Mes contacts</h1>
+				<p className="text-sm text-neutral-600">Retrouvez tous les contacts ajoutes pendant l&apos;evenement.</p>
 			</div>
 
 			{vm.connections.length === 0 ? (
 				<Card>
-					<p className="text-sm text-neutral-500">Aucune connexion pour le moment.</p>
+					<p className="text-sm text-neutral-500">Aucun contact pour l&apos;instant. Scannez un badge pour commencer.</p>
 				</Card>
 			) : (
 				<div className="space-y-3">
@@ -53,7 +52,7 @@ export function OwnerContactsPage({ profileId }: Props) {
 								<div className="text-base font-semibold">{connection.displayName || "Contact sans nom"}</div>
 								<p className="text-sm text-neutral-600">{connection.headline || "Headline indisponible"}</p>
 								<div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-neutral-500">
-									<span>{connection.role}</span>
+									<span>{connection.role || "Role indisponible"}</span>
 									<span>{formatConnectionDate(connection.createdAt)}</span>
 								</div>
 							</div>

@@ -10,6 +10,17 @@ type Props = {
   profileId: string;
 };
 
+function formatConnectionDate(value: string) {
+  if (!value) return "Date indisponible";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("fr-FR", {
+    dateStyle: "medium",
+  }).format(date);
+}
+
 export function OwnerDashboardPage({ profileId }: Props) {
   const vm = useOwnerDashboardVM(profileId);
 
@@ -35,16 +46,17 @@ export function OwnerDashboardPage({ profileId }: Props) {
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-4 p-4">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <div className="space-y-1">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <p className="text-sm text-neutral-600">Suivez vos scans et retrouvez rapidement vos derniers contacts.</p>
+      </div>
 
       <Card>
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex-1 space-y-4">
             <div>
               <div className="text-lg font-semibold">{profile.displayName || "Profil"}</div>
-              <div className="text-sm text-neutral-500">{profile.slug ? `@${profile.slug}` : "Slug indisponible"}</div>
-              <div className="text-xs text-neutral-500">Status : {profile.status}</div>
-              <div className="text-xs text-neutral-500">Role : {profile.role}</div>
+              <div className="text-sm text-neutral-500">{profile.slug ? `@${profile.slug}` : "Votre profil meetup"}</div>
             </div>
 
             <DashboardStats
@@ -59,9 +71,7 @@ export function OwnerDashboardPage({ profileId }: Props) {
                 <ProfileQrCode url={badgeUrl} />
                 <div className="w-full space-y-2 text-center">
                   <div className="text-sm font-medium">Votre badge</div>
-                  <a className="break-all text-sm text-blue-600 underline" href={badgeUrl}>
-                    {badgeUrl}
-                  </a>
+                  <p className="text-sm text-neutral-500">Scannez ce QR code pour echanger vos contacts.</p>
                 </div>
               </>
             ) : (
@@ -72,11 +82,9 @@ export function OwnerDashboardPage({ profileId }: Props) {
       </Card>
 
       <Card>
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold">Aperçu des connexions</h2>
-          <Link className="text-sm text-blue-600 underline" href={`/dashboard/${profileId}/contacts`}>
-            Voir tout
-          </Link>
+        <div className="mb-4 space-y-1">
+          <h2 className="text-lg font-semibold">Connexions recentes</h2>
+          <p className="text-sm text-neutral-600">Les derniers contacts ajoutes a votre liste.</p>
         </div>
 
         {recentConnections.length === 0 ? (
@@ -96,7 +104,7 @@ export function OwnerDashboardPage({ profileId }: Props) {
                 ) : null}
                 <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-neutral-500">
                   <span>{connection.role}</span>
-                  <span>{connection.createdAt || "Date indisponible"}</span>
+                  <span>{formatConnectionDate(connection.createdAt)}</span>
                 </div>
               </div>
             ))}
@@ -106,6 +114,15 @@ export function OwnerDashboardPage({ profileId }: Props) {
         {vm.connectionsError ? (
           <p className="mt-3 text-sm text-neutral-500">{vm.connectionsError}</p>
         ) : null}
+
+        <div className="mt-4">
+          <Link
+            className="block rounded-xl border border-black bg-black px-4 py-3 text-center text-sm font-medium text-white"
+            href={`/dashboard/${profileId}/contacts`}
+          >
+            Voir tous mes contacts
+          </Link>
+        </div>
       </Card>
     </main>
   );

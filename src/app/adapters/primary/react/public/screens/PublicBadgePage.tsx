@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ProfileHero } from "@/app/adapters/primary/react/public/components/ProfileHero";
 import { usePublicBadgeVM } from "@/app/adapters/secondary/view-model/usePublicBadgeVM";
@@ -15,6 +14,11 @@ export function PublicBadgePage({ badgeToken }: Props) {
 	const vm = usePublicBadgeVM(badgeToken);
 	const router = useRouter();
 	const returnTo = `/b/${badgeToken}`;
+	const feedbackMessage = vm.connectionAdded
+		? "Contact ajoute"
+		: vm.alreadyConnected
+			? "Deja dans vos contacts"
+			: "";
 
 	if (vm.loading) {
 		return <main className="mx-auto max-w-md p-4">Chargement...</main>;
@@ -25,48 +29,51 @@ export function PublicBadgePage({ badgeToken }: Props) {
 	}
 
 	return (
-		<main className="mx-auto flex min-h-screen max-w-md flex-col gap-4 p-4">
+		<main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-4 p-4">
 			<Card>
-				<div className="space-y-3">
+				<div className="space-y-6">
 					<ProfileHero displayName={vm.badge.displayName} headline={vm.badge.headline} bio="" />
-				</div>
-			</Card>
-
-			<Card>
-				<div className="space-y-4">
 					<p className="text-sm text-neutral-600">
-						Ajoute ce contact pour le retrouver apres l'evenement
+						Scanne enregistre. Ajoutez ce contact pour le retrouver apres l&apos;evenement.
 					</p>
 
-					{vm.identity ? vm.connectionAdded ? (
-						<div className="w-full rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-center text-sm font-medium text-green-700">
-							✓ Contact ajoute
+					{vm.identity ? (
+						<div className="space-y-3">
+							<Button
+								className="w-full text-base"
+								disabled={vm.submitting || vm.connectionAdded || vm.alreadyConnected}
+								onClick={() => void vm.connect()}
+							>
+								{vm.connectionAdded
+									? "Contact ajoute"
+									: vm.alreadyConnected
+										? "Deja dans vos contacts"
+										: vm.submitting
+											? "Ajout en cours..."
+											: "Ajouter ce contact"}
+							</Button>
+
+							{feedbackMessage ? (
+								<div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-center text-sm font-medium text-green-700">
+									{feedbackMessage}
+								</div>
+							) : null}
 						</div>
-					) : (
-						<Button className="w-full" disabled={vm.submitting} onClick={() => void vm.connect()}>
-							{vm.submitting ? "Ajout..." : "Ajouter ce contact"}
-						</Button>
 					) : (
 						<div className="space-y-3">
 							<Button
-								className="w-full"
+								className="w-full text-base"
 								onClick={() => router.push(`/create?returnTo=${encodeURIComponent(returnTo)}`)}
 							>
 								Creer mon badge
 							</Button>
 							<p className="text-center text-sm text-neutral-500">
-								Cree ton badge pour echanger tes contacts
+								Creez votre badge pour ajouter ce contact en un clic.
 							</p>
 						</div>
 					)}
 
 					{vm.actionError ? <p className="text-sm text-red-500">{vm.actionError}</p> : null}
-
-					{vm.identity ? (
-						<Link className="block text-center text-sm text-neutral-500 underline" href={`/dashboard/${vm.identity.profileId}`}>
-							Voir mon dashboard
-						</Link>
-					) : null}
 				</div>
 			</Card>
 		</main>

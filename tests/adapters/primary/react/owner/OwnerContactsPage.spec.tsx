@@ -19,8 +19,8 @@ describe("OwnerContactsPage", () => {
 
 		render(<OwnerContactsPage profileId="profile-1" />);
 
-		expect(screen.getByText("Mes connexions")).toBeTruthy();
-		expect(screen.getByText("Aucune connexion pour le moment.")).toBeTruthy();
+		expect(screen.getByText("Mes contacts")).toBeTruthy();
+		expect(screen.getByText("Aucun contact pour l'instant. Scannez un badge pour commencer.")).toBeTruthy();
 	});
 
 	it("shows the full connections list", () => {

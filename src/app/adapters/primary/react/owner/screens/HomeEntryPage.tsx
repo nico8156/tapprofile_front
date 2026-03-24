@@ -21,22 +21,22 @@ export function HomeEntryPage() {
 						<p className="text-sm text-neutral-500">Chargement...</p>
 					) : vm.identity ? (
 						<>
-							<p className="text-sm text-neutral-600">Accedez directement a votre espace.</p>
-							<Link className="block rounded-xl border border-black bg-black px-4 py-3 text-center text-sm font-medium text-white" href={`/dashboard/${profileId}`}>
-								Voir mon dashboard
-							</Link>
+							<p className="text-sm text-neutral-600">Retrouvez votre badge, vos contacts et votre dashboard.</p>
 							<Link className="block rounded-xl border border-neutral-200 px-4 py-3 text-center text-sm font-medium" href={`/dashboard/${profileId}#badge`}>
 								Voir mon badge
 							</Link>
 							<Link className="block rounded-xl border border-neutral-200 px-4 py-3 text-center text-sm font-medium" href={`/dashboard/${profileId}/contacts`}>
 								Voir mes contacts
 							</Link>
+							<Link className="block rounded-xl border border-black bg-black px-4 py-3 text-center text-sm font-medium text-white" href={`/dashboard/${profileId}`}>
+								Voir mon dashboard
+							</Link>
 						</>
 					) : (
 						<>
 							<p className="text-sm text-neutral-600">Creez votre badge pour commencer a partager et retrouver vos connexions.</p>
 							<Link className="block rounded-xl border border-black bg-black px-4 py-3 text-center text-sm font-medium text-white" href="/create">
-								Creer mon profil
+								Creer mon badge
 							</Link>
 						</>
 					)}

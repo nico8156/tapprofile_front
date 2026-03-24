@@ -18,7 +18,7 @@ describe("HomeEntryPage", () => {
 
 		render(<HomeEntryPage />);
 
-		expect(screen.getByText("Creer mon profil")).toBeTruthy();
+		expect(screen.getByText("Creer mon badge")).toBeTruthy();
 		expect(screen.queryByText("Voir mon dashboard")).toBeNull();
 	});
 

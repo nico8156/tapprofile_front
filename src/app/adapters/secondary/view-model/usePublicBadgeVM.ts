@@ -13,6 +13,7 @@ export function usePublicBadgeVM(badgeToken: string) {
 	const [pageError, setPageError] = useState("");
 	const [actionError, setActionError] = useState("");
 	const [connectionAdded, setConnectionAdded] = useState(false);
+	const [alreadyConnected, setAlreadyConnected] = useState(false);
 	const [identity, setIdentity] = useState<LocalIdentity | null>(null);
 	const [badge, setBadge] = useState<null | {
 		profileId: string;
@@ -48,8 +49,31 @@ export function usePublicBadgeVM(badgeToken: string) {
 		};
 	}, [badgeToken, gateway]);
 
+	useEffect(() => {
+		let active = true;
+
+		if (!identity || !badge) {
+			setAlreadyConnected(false);
+			return () => {
+				active = false;
+			};
+		}
+
+		(async () => {
+			const result = await gateway.getConnections(identity.profileId);
+			if (!active || !result.ok) return;
+
+			const exists = (result.value ?? []).some((connection) => connection.profileId === badge.profileId);
+			setAlreadyConnected(exists);
+		})();
+
+		return () => {
+			active = false;
+		};
+	}, [badge, gateway, identity]);
+
 	const connect = async () => {
-		if (!identity || submitting || connectionAdded) return;
+		if (!identity || submitting || connectionAdded || alreadyConnected) return;
 
 		setSubmitting(true);
 		setActionError("");
@@ -71,6 +95,7 @@ export function usePublicBadgeVM(badgeToken: string) {
 
 		setActionError("");
 		setConnectionAdded(true);
+		setAlreadyConnected(false);
 		setSubmitting(false);
 		return result;
 	};
@@ -81,6 +106,7 @@ export function usePublicBadgeVM(badgeToken: string) {
 		pageError,
 		actionError,
 		connectionAdded,
+		alreadyConnected,
 		badge,
 		identity,
 		connect,
