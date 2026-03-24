@@ -1,298 +1,226 @@
-# TapProfile — Reprise projet (MVP badge + connections)
+# TapProfile Frontend Agent Guide
 
-## 🎯 Objectif actuel
+## 🎯 Current Product State
 
-Finaliser un MVP fonctionnel pour meetup permettant :
+The MVP is FUNCTIONAL and STABLE.
 
-* créer un badge (profil)
-* échanger des contacts via QR code
-* consulter ses connexions
-* exploiter les données après l’événement
+Core flow works end-to-end:
+- create profile
+- publish profile
+- generate badge (QR)
+- scan badge
+- create connection
+- view dashboard
+- view contacts
+- simple entry point
+- product landing pages
+
+The focus is now:
+👉 UX clarity
+👉 onboarding
+👉 conversion
+👉 product iteration
 
 ---
 
-# A. 🔐 CONTRATS BACKEND (SOURCE DE VÉRITÉ)
+# A. 🔐 BACKEND CONTRACTS (SOURCE OF TRUTH)
 
-## 1. Create profile
+⚠️ NEVER invent fields. ALWAYS respect backend responses.
 
+### Create profile
 POST /api/profiles
 
-request:
-{
-"slug": string,
-"displayName": string,
-"headline": string,
-"bio": string,
-"role": "VISITOR" | "EXHIBITOR"
-}
-
-response 201:
-{
-"profileId": string
-}
+Required:
+- slug
+- displayName
+- headline (MUST NOT be blank)
+- bio
+- role: VISITOR | EXHIBITOR
 
 ---
 
-## 2. Publish profile
-
-POST /api/profiles/{profileId}/publish
-
-response: 204
+### Publish profile
+POST /api/profiles/{profileId}/publish → 204
 
 ---
 
-## 3. Get dashboard
-
+### Dashboard
 GET /api/profiles/{profileId}/dashboard
 
-response:
-{
-"profile": {
-"profileId": string,
-"slug": string,
-"displayName": string,
-"role": string,
-"status": string
-},
-"metrics": {
-"viewCount": number,
-"scanCount": number,
-"leadCount": number,
-"connectionCount": number,
-"conversionRate": number
-},
-"recentLeads": []
-}
+Contains:
+- profile
+- metrics:
+  - viewCount
+  - scanCount
+  - leadCount (legacy)
+  - connectionCount
+  - conversionRate
+- recentLeads (legacy)
 
-⚠️ NOTE:
-
-* PAS de badge dans cette réponse
-* PAS de recentConnections
+⚠️ DO NOT expect:
+- badge
+- recentConnections
 
 ---
 
-## 4. Get badge (owner)
-
+### Badge
 GET /api/profiles/{profileId}/badge
 
-response:
-{
-"badgeToken": string,
-"publicBadgeUrl": string
-}
-
 ---
 
-## 5. Get public badge
-
+### Public badge
 GET /api/public/badges/{badgeToken}
 
-response:
-{
-"profileId": string,
-"displayName": string,
-"headline": string,
-"role": string
-}
-
 ---
 
-## 6. Create connection
-
-POST /api/connections
-
-request:
-{
-"sourceProfileId": string,
-"targetProfileId": string
-}
-
-response: 201
-
----
-
-## 7. Get connections
-
+### Connections
 GET /api/profiles/{profileId}/connections
 
-response:
-[
+Returns ARRAY (not nested):
+- profileId
+- displayName
+- headline
+- role
+- createdAt
+
+---
+
+### Create connection
+POST /api/connections
+
+⚠️ Backend is IDPOTENT:
+- A-B and B-A must NOT create duplicates
+
+---
+
+### Error format
+
+```json
 {
-"profileId": string,
-"displayName": string,
-"headline": string,
-"role": string,
-"createdAt": string
+  "errors": [{ "code": "", "message": "", "field": "" }]
 }
-]
+```
 
----
+B. 🧱 ARCHITECTURE
+Stack
+Next.js App Router
+Hexa-inspired frontend
+Layers
+core-logic → usecases
+adapters → gateways + view-models
+UI → React components
+Identity
 
-## 8. Error format
+localStorage key:
+tapprofile.identity
 
-{
-"errors": [
-{
-"code": string,
-"message": string,
-"field": string | null
-}
-]
-}
+C. 🚀 CURRENT FEATURES (STABLE)
+Core
+profile creation
+publish
+badge generation
+QR display
+scan → public badge
+connection creation (no duplicates)
+dashboard (scans + connections)
+contacts page
+local identity
+UX (recent improvements)
+no automatic redirects
+single CTA per screen
+clear success states
+connection feedback (added / already exists)
+dashboard simplified
+mobile-first readability
+Landing pages
+/product (baseline)
+/product-v2 (pain-driven)
+/product-v3 (projection)
 
----
+Used for messaging & A/B testing.
 
-# B. 🧱 ARCHITECTURE PROJET
+D. 🎯 CURRENT PRIORITIES
 
-## Backend
+We are no longer building core features.
 
-* Spring Boot
-* Hexagonal architecture
-* Domain-driven (VO, invariants)
-* Result pattern
-* No mocks
-* Tests:
+We are optimizing:
 
-  * unit
-  * integration (IT)
-  * E2E style
+1. UX clarity
+instant understanding (2 seconds)
+no ambiguity
+no friction
+2. Onboarding
+explain value immediately
+guide first action
+3. Conversion
+scan → click → connection
+reduce hesitation
+improve CTA clarity
+4. Landing experiments
+test different messaging angles
+compare variants manually
+no premature tracking complexity
+E. 🧠 BUSINESS INVARIANTS
+one connection per pair (A-B == B-A)
+no redirect without user intent
+one action = one click
+UI must NEVER crash
+arrays must NEVER be undefined
+success must always give feedback
+user must always know what to do next
+F. 🛠️ CODEX RULES
 
-## Frontend
+ALWAYS:
 
-* Next.js (App Router)
-* Hexa-inspired:
+no massive refactor
+incremental changes only
+respect architecture
+respect backend contracts
+mobile-first
+simple UX
 
-  * core-logic (usecases)
-  * adapters (gateway, view-model)
-  * UI React
-* localStorage pour identity:
-  "tapprofile.identity"
+NEVER:
 
----
+invent backend fields
+add hidden logic
+introduce multiple competing CTAs
+over-engineer
+G. 🧪 MVP TEST SCENARIO
+create profile A
+publish + get badge
+open badge in private mode
+create profile B
+scan A
+add contact
+verify:
+connectionCount
+contacts list
+no duplicate on reverse scan
+H. 🎯 PRODUCT VISION
 
-# C. 🚀 ÉTAT ACTUEL MVP
+"Exchange contacts at meetups as easily as scanning a QR code."
 
-## Ce qui fonctionne
+I. 🚀 CURRENT PHASE
 
-* création profil
-* publication
-* génération badge
-* QR code
-* scan → page badge
-* création connection
-* dashboard avec stats
-* stockage identité locale
+We are now in:
 
-## Problèmes résolus récemment
+👉 PRODUCT OPTIMIZATION PHASE
 
-* redirect automatique supprimé
-* badge chargé séparément
-* dashboard aligné backend
-* crash undefined corrigés
+Focus:
 
----
+UX
+clarity
+conversion
+real-world usage
 
-# D. 🎯 OBJECTIF FINAL MVP (PROCHAINS PAS)
+NOT:
 
-## 1. Page contacts dédiée
+new complex features
+architecture redesign
+FINAL RULE
 
-Route:
-/dashboard/{profileId}/contacts
+If in doubt:
 
-Afficher:
+👉 prefer simplicity + clarity over completenessgg
 
-* liste complète des connections
-* nom
-* headline
-* role
-* date
 
----
-
-## 2. Dashboard propre
-
-* supprimer toute notion de "lead"
-* remplacer par "connexions"
-* afficher:
-
-  * scanCount
-  * connectionCount
-  * preview des connexions
-
----
-
-## 3. Badge téléchargeable
-
-Permettre:
-
-* télécharger image (QR + nom + headline)
-
----
-
-## 4. Accès utilisateur simple
-
-Créer page d’entrée:
-
-* si identity existe:
-
-  * "Voir mon dashboard"
-  * "Voir mon badge"
-  * "Voir mes contacts"
-
----
-
-## 5. UX mobile-first
-
-* pages lisibles en 2 secondes
-* CTA unique
-* feedback immédiat
-
----
-
-# E. 🧠 INVARIANTS MÉTIER
-
-* une connection nécessite:
-
-  * un scanner identifié (identity locale)
-  * un badge scanné valide
-* pas de redirect automatique
-* une action = un click utilisateur
-* dashboard ne doit jamais crash
-* tableaux → jamais undefined
-
----
-
-# F. 🛠️ RÈGLES POUR CODEX
-
-Toujours:
-
-* PAS de refactor massif
-* respecter architecture existante
-* changements incrémentaux
-* adapter au contrat backend réel
-* ajouter tests si nécessaire
-* rester mobile-first
-
----
-
-# G. 🧪 SCÉNARIO DE TEST MVP
-
-1. créer profil A
-2. récupérer badge A
-3. ouvrir badge A en navigation privée
-4. créer profil B
-5. retour badge A
-6. ajouter contact
-7. vérifier:
-
-   * connectionCount B
-   * GET /connections B
-   * affichage dashboard B
-
----
-
-# H. OBJECTIF PRODUIT
-
-"Échanger ses contacts en meetup aussi facilement qu’un QR code, et les retrouver ensuite sans friction."
-
----
