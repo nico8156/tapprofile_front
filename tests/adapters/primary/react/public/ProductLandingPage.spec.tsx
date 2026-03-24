@@ -15,4 +15,20 @@ describe("ProductLandingPage", () => {
 		expect(screen.getByText("Trois etapes, rien de plus")).toBeTruthy();
 		expect(screen.getByText("Meetups")).toBeTruthy();
 	});
+
+	it("renders the pain-driven variant", () => {
+		render(<ProductLandingPage variant="pain" />);
+
+		expect(screen.getByText("Ne perdez plus jamais un contact apres un meetup")).toBeTruthy();
+		expect(screen.getByText("Un QR code suffit pour garder le lien apres l'evenement.")).toBeTruthy();
+		expect(screen.getByText("Evite les oublis")).toBeTruthy();
+	});
+
+	it("renders the outcome-driven variant", () => {
+		render(<ProductLandingPage variant="outcome" />);
+
+		expect(screen.getByText("Tous vos contacts de meetup, au meme endroit")).toBeTruthy();
+		expect(screen.getByText("Scannez, connectez, retrouvez vos contacts sans carte de visite ni friction.")).toBeTruthy();
+		expect(screen.getByText("Un point d'entree unique")).toBeTruthy();
+	});
 });

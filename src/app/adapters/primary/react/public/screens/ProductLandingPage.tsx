@@ -1,42 +1,144 @@
 import Link from "next/link";
 import { Card } from "@/app/components/ui/Card";
 
-const steps = [
-	{
-		eyebrow: "01",
-		title: "Creez votre badge",
-		description: "Ajoutez votre nom et votre headline en quelques secondes.",
-	},
-	{
-		eyebrow: "02",
-		title: "Faites-vous scanner",
-		description: "Montrez votre QR code pendant l'evenement pour echanger vos contacts.",
-	},
-	{
-		eyebrow: "03",
-		title: "Retrouvez vos contacts",
-		description: "Gardez toutes vos connexions au meme endroit apres le meetup.",
-	},
-];
+type ProductLandingVariant = "control" | "pain" | "outcome";
 
-const benefits = [
+const variantContent: Record<
+	ProductLandingVariant,
 	{
-		title: "Plus simple qu'une carte de visite",
-		description: "Un badge clair, un QR code, un scan. Pas de friction, pas de papier.",
+		heroLabel: string;
+		title: string;
+		description: string;
+		steps: Array<{ eyebrow: string; title: string; description: string }>;
+		benefits: Array<{ title: string; description: string }>;
+		ctaTitle: string;
+	}
+> = {
+	// variant = control
+	control: {
+		heroLabel: "Echanger ses contacts en meetup aussi facilement qu'un QR code",
+		title: "Echangez vos contacts en 1 scan",
+		description: "Creez votre badge, montrez votre QR code, retrouvez vos connexions apres l'evenement.",
+		steps: [
+			{
+				eyebrow: "01",
+				title: "Creez votre badge",
+				description: "Ajoutez votre nom et votre headline en quelques secondes.",
+			},
+			{
+				eyebrow: "02",
+				title: "Faites-vous scanner",
+				description: "Montrez votre QR code pendant l'evenement pour echanger vos contacts.",
+			},
+			{
+				eyebrow: "03",
+				title: "Retrouvez vos contacts",
+				description: "Gardez toutes vos connexions au meme endroit apres le meetup.",
+			},
+		],
+		benefits: [
+			{
+				title: "Plus simple qu'une carte de visite",
+				description: "Un badge clair, un QR code, un scan. Pas de friction, pas de papier.",
+			},
+			{
+				title: "Aucun contact perdu",
+				description: "Chaque scan devient une connexion que vous pouvez retrouver apres l'evenement.",
+			},
+			{
+				title: "Vos connexions centralisees",
+				description: "Consultez vos contacts depuis votre dashboard sans chercher dans vos notes.",
+			},
+		],
+		ctaTitle: "Creez votre badge et commencez a echanger vos contacts tout de suite",
 	},
-	{
-		title: "Aucun contact perdu",
-		description: "Chaque scan devient une connexion que vous pouvez retrouver apres l'evenement.",
+	// variant = pain
+	pain: {
+		heroLabel: "Ne laissez plus un meetup se terminer avec des contacts perdus",
+		title: "Ne perdez plus jamais un contact apres un meetup",
+		description: "Un QR code suffit pour garder le lien apres l'evenement.",
+		steps: [
+			{
+				eyebrow: "01",
+				title: "Creez votre badge",
+				description: "Preparez un badge simple a montrer au bon moment, sans carte de visite.",
+			},
+			{
+				eyebrow: "02",
+				title: "Faites-vous scanner",
+				description: "Un scan suffit pour eviter les contacts notes a la va-vite ou oublies apres coup.",
+			},
+			{
+				eyebrow: "03",
+				title: "Retrouvez vos contacts",
+				description: "Chaque rencontre reste disponible apres l'evenement, au meme endroit.",
+			},
+		],
+		benefits: [
+			{
+				title: "Evite les oublis",
+				description: "Plus besoin de cartes perdues, de notes eparses ou de promesses de recontact jamais tenues.",
+			},
+			{
+				title: "Le bon contact, au bon moment",
+				description: "Retrouvez rapidement qui vous avez croise et relancez apres le meetup sans friction.",
+			},
+			{
+				title: "Un geste plus fiable",
+				description: "Un QR code remplace les echanges approximatifs et garde une trace claire de chaque connexion.",
+			},
+		],
+		ctaTitle: "Creez votre badge et ne laissez plus filer vos contacts apres l'evenement",
 	},
-	{
-		title: "Vos connexions centralisees",
-		description: "Consultez vos contacts depuis votre dashboard sans chercher dans vos notes.",
+	// variant = outcome
+	outcome: {
+		heroLabel: "Centralisez vos contacts de meetup dans un flux simple et lisible",
+		title: "Tous vos contacts de meetup, au meme endroit",
+		description: "Scannez, connectez, retrouvez vos contacts sans carte de visite ni friction.",
+		steps: [
+			{
+				eyebrow: "01",
+				title: "Creez votre badge",
+				description: "Mettez en place votre badge en quelques secondes pour etre pret des votre arrivee.",
+			},
+			{
+				eyebrow: "02",
+				title: "Scannez et connectez",
+				description: "Le QR code rend l'echange immediat et transforme chaque rencontre en connexion exploitable.",
+			},
+			{
+				eyebrow: "03",
+				title: "Retrouvez tout",
+				description: "Vos contacts restent centralises pour suivre vos echanges apres l'evenement.",
+			},
+		],
+		benefits: [
+			{
+				title: "Un point d'entree unique",
+				description: "Toutes vos connexions restent reunies dans le meme dashboard, sans dispersion.",
+			},
+			{
+				title: "Simple a partager",
+				description: "Un badge clair et un QR code suffisent pour fluidifier chaque prise de contact.",
+			},
+			{
+				title: "Simple a retrouver",
+				description: "Vous revenez apres le meetup avec une liste exploitable, pas avec un tas de cartes.",
+			},
+		],
+		ctaTitle: "Creez votre badge et centralisez vos contacts des aujourd'hui",
 	},
-];
+};
 
 const useCases = ["Meetups", "Salons", "Conferences", "Networking"];
 
-export function ProductLandingPage() {
+type ProductLandingPageProps = {
+	variant?: ProductLandingVariant;
+};
+
+export function ProductLandingPage({ variant = "control" }: ProductLandingPageProps) {
+	const content = variantContent[variant];
+
 	return (
 		<main
 			className="min-h-screen bg-[radial-gradient(circle_at_top,_#ffffff_0%,_#f7f8fc_52%,_#eef2ff_100%)] text-neutral-950"
@@ -58,14 +160,12 @@ export function ProductLandingPage() {
 				<section className="grid gap-6 py-6 md:grid-cols-[1.1fr_0.9fr] md:items-center md:py-12">
 					<div className="space-y-5">
 						<div className="inline-flex rounded-full border border-sky-100 bg-white/80 px-3 py-1 text-xs font-semibold text-sky-700 shadow-sm backdrop-blur">
-							Echanger ses contacts en meetup aussi facilement qu'un QR code
+							{content.heroLabel}
 						</div>
 						<div className="space-y-4">
-							<h1 className="max-w-xl text-5xl font-extrabold tracking-[-0.06em] text-balance sm:text-6xl">
-								Echangez vos contacts en 1 scan
-							</h1>
+							<h1 className="max-w-xl text-5xl font-extrabold tracking-[-0.06em] text-balance sm:text-6xl">{content.title}</h1>
 							<p className="max-w-lg text-base leading-7 text-neutral-600 sm:text-lg">
-								Creez votre badge, montrez votre QR code, retrouvez vos connexions apres l'evenement.
+								{content.description}
 							</p>
 						</div>
 						<div className="flex flex-col gap-3 sm:flex-row">
@@ -153,7 +253,7 @@ export function ProductLandingPage() {
 								<h2 className="text-3xl font-bold tracking-[-0.04em]">Trois etapes, rien de plus</h2>
 							</div>
 							<div className="grid gap-3 md:grid-cols-3">
-								{steps.map((step) => (
+								{content.steps.map((step) => (
 									<div key={step.eyebrow} className="rounded-3xl border border-neutral-100 bg-neutral-50 p-5">
 										<p className="text-xs font-semibold tracking-[0.2em] text-sky-600 uppercase">{step.eyebrow}</p>
 										<h3 className="mt-4 text-lg font-semibold text-neutral-900">{step.title}</h3>
@@ -172,7 +272,7 @@ export function ProductLandingPage() {
 							<h2 className="text-3xl font-bold tracking-[-0.04em]">Le bon reflexe pour un evenement</h2>
 						</div>
 						<div className="grid gap-3 md:grid-cols-3">
-							{benefits.map((benefit) => (
+							{content.benefits.map((benefit) => (
 								<Card key={benefit.title}>
 									<h3 className="text-lg font-semibold text-neutral-900">{benefit.title}</h3>
 									<p className="mt-2 text-sm leading-6 text-neutral-600">{benefit.description}</p>
@@ -207,7 +307,7 @@ export function ProductLandingPage() {
 					<div className="rounded-[2rem] border border-sky-100 bg-white px-5 py-8 text-center shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
 						<p className="text-sm font-semibold text-sky-700">Pret pour votre prochain evenement ?</p>
 						<h2 className="mx-auto mt-3 max-w-md text-3xl font-bold tracking-[-0.05em] text-neutral-950">
-							Creez votre badge et commencez a echanger vos contacts tout de suite
+							{content.ctaTitle}
 						</h2>
 						<div className="mt-6">
 							<Link
