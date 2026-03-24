@@ -19,16 +19,23 @@ describe("ProductLandingPage", () => {
 	it("renders the pain-driven variant", () => {
 		render(<ProductLandingPage variant="pain" />);
 
-		expect(screen.getByText("Ne perdez plus jamais un contact apres un meetup")).toBeTruthy();
-		expect(screen.getByText("Un QR code suffit pour garder le lien apres l'evenement.")).toBeTruthy();
-		expect(screen.getByText("Evite les oublis")).toBeTruthy();
+		expect(screen.getByText("Vous perdez vos contacts apres chaque meetup ?")).toBeTruthy();
+		expect(
+			screen.getByText("Cartes de visite oubliees, LinkedIn jamais retrouves. Gardez chaque contact en un scan."),
+		).toBeTruthy();
+		expect(screen.getByText("Ce qui se passe aujourd'hui")).toBeTruthy();
+		expect(screen.getAllByText("Vous oubliez les noms").length).toBeGreaterThan(0);
+		expect(screen.getByText("TapProfile remplace les oublis par une action claire")).toBeTruthy();
+		expect(screen.getAllByText("Garder mes contacts").length).toBeGreaterThan(0);
 	});
 
 	it("renders the outcome-driven variant", () => {
 		render(<ProductLandingPage variant="outcome" />);
 
-		expect(screen.getByText("Tous vos contacts de meetup, au meme endroit")).toBeTruthy();
-		expect(screen.getByText("Scannez, connectez, retrouvez vos contacts sans carte de visite ni friction.")).toBeTruthy();
-		expect(screen.getByText("Un point d'entree unique")).toBeTruthy();
+		expect(screen.getByText("Un scan. Et le contact est enregistre.")).toBeTruthy();
+		expect(screen.getByText("Pas de carte de visite. Pas d'effort. Juste une connexion instantanee.")).toBeTruthy();
+		expect(screen.getByText("Imaginez un meetup")).toBeTruthy();
+		expect(screen.getAllByText("Vous discutez").length).toBeGreaterThan(0);
+		expect(screen.getByText("Zero carte de visite")).toBeTruthy();
 	});
 });
