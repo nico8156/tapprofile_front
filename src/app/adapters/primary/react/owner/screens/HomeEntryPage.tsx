@@ -11,8 +11,8 @@ export function HomeEntryPage() {
 	return (
 		<main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-4 p-4">
 			<div className="space-y-2">
-				<h1 className="text-3xl font-bold">TapProfile</h1>
-				<p className="text-sm text-neutral-600">Echangez vos contacts en meetup aussi simplement qu&apos;un QR code.</p>
+				<h1 className="text-3xl font-bold">Ton badge pour echanger tes contacts en 1 scan</h1>
+				<p className="text-sm text-neutral-600">Montre ton QR → on te scanne → retrouve tes contacts apres l&apos;evenement</p>
 			</div>
 
 			<Card>
@@ -34,7 +34,6 @@ export function HomeEntryPage() {
 						</>
 					) : (
 						<>
-							<p className="text-sm text-neutral-600">Creez votre badge pour commencer a partager et retrouver vos connexions.</p>
 							<Link className="block rounded-xl border border-black bg-black px-4 py-3 text-center text-sm font-medium text-white" href="/create">
 								Creer mon badge
 							</Link>

@@ -18,6 +18,8 @@ describe("HomeEntryPage", () => {
 
 		render(<HomeEntryPage />);
 
+		expect(screen.getByText("Ton badge pour echanger tes contacts en 1 scan")).toBeTruthy();
+		expect(screen.getByText("Montre ton QR → on te scanne → retrouve tes contacts apres l'evenement")).toBeTruthy();
 		expect(screen.getByText("Creer mon badge")).toBeTruthy();
 		expect(screen.queryByText("Voir mon dashboard")).toBeNull();
 	});

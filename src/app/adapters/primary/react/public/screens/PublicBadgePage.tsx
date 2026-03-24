@@ -16,7 +16,6 @@ export function PublicBadgePage({ badgeToken }: Props) {
 	const router = useRouter();
 	const returnTo = `/b/${badgeToken}`;
 	const contactsHref = vm.identity ? `/dashboard/${vm.identity.profileId}/contacts` : "";
-	const dashboardHref = vm.identity ? `/dashboard/${vm.identity.profileId}` : "";
 	const showPostSuccessActions = Boolean(vm.identity && (vm.connectionAdded || vm.alreadyConnected));
 
 	if (vm.loading) {
@@ -31,10 +30,10 @@ export function PublicBadgePage({ badgeToken }: Props) {
 		<main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-4 p-4">
 			<Card>
 				<div className="space-y-6">
-					<ProfileHero displayName={vm.badge.displayName} headline={vm.badge.headline} bio="" />
-					<p className="text-sm text-neutral-600">
-						Scanne enregistre. Ajoutez ce contact pour le retrouver apres l&apos;evenement.
-					</p>
+					<div className="space-y-3">
+						<ProfileHero displayName={vm.badge.displayName} headline={vm.badge.headline} bio="" />
+						<p className="text-sm text-neutral-600">Ne perdez pas ce contact apres l&apos;evenement</p>
+					</div>
 
 					{vm.identity ? (
 						<div className="space-y-3">
@@ -52,7 +51,17 @@ export function PublicBadgePage({ badgeToken }: Props) {
 											: "Ajouter ce contact"}
 							</Button>
 
-							{showPostSuccessActions ? (
+							{vm.connectionAdded ? (
+								<div className="space-y-2">
+									<p className="text-center text-sm text-neutral-600">Retrouvez-le dans vos contacts</p>
+									<Link
+										className="block rounded-xl border border-black bg-black px-4 py-3 text-center text-sm font-medium text-white"
+										href={contactsHref}
+									>
+										Voir mes contacts
+									</Link>
+								</div>
+							) : showPostSuccessActions ? (
 								<div className="space-y-2">
 									<Link
 										className="block rounded-xl border border-black bg-black px-4 py-3 text-center text-sm font-medium text-white"
@@ -60,11 +69,10 @@ export function PublicBadgePage({ badgeToken }: Props) {
 									>
 										Voir mes contacts
 									</Link>
-									<Link className="block text-center text-sm text-neutral-500 underline" href={dashboardHref}>
-										Retour au dashboard
-									</Link>
 								</div>
-							) : null}
+							) : (
+								<p className="text-center text-sm text-neutral-500">Ajout instantane</p>
+							)}
 						</div>
 					) : (
 						<div className="space-y-3">

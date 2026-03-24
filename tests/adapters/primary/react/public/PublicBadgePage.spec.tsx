@@ -47,8 +47,9 @@ describe("PublicBadgePage", () => {
 		render(<PublicBadgePage badgeToken="badge-1" />);
 
 		expect(screen.getAllByText("Contact ajoute")).toHaveLength(1);
+		expect(screen.getByText("Retrouvez-le dans vos contacts")).toBeTruthy();
 		expect(screen.getByText("Voir mes contacts")).toBeTruthy();
-		expect(screen.getByText("Retour au dashboard")).toBeTruthy();
+		expect(screen.queryByText("Retour au dashboard")).toBeNull();
 	});
 
 	it("shows a coherent already connected state without duplicate feedback", () => {
@@ -79,5 +80,6 @@ describe("PublicBadgePage", () => {
 
 		expect(screen.getAllByText("Deja dans vos contacts")).toHaveLength(1);
 		expect(screen.getByText("Voir mes contacts")).toBeTruthy();
+		expect(screen.queryByText("Retrouvez-le dans vos contacts")).toBeNull();
 	});
 });
