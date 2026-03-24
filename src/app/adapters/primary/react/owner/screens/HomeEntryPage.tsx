@@ -13,6 +13,9 @@ export function HomeEntryPage() {
 			<div className="space-y-2">
 				<h1 className="text-3xl font-bold">Ton badge pour echanger tes contacts en 1 scan</h1>
 				<p className="text-sm text-neutral-600">Montre ton QR → on te scanne → retrouve tes contacts apres l&apos;evenement</p>
+				<Link className="inline-flex text-sm font-medium text-neutral-700 underline underline-offset-4" href="/product">
+					Voir la presentation produit
+				</Link>
 			</div>
 
 			<Card>
