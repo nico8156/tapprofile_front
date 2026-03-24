@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ProfileHero } from "@/app/adapters/primary/react/public/components/ProfileHero";
 import { usePublicBadgeVM } from "@/app/adapters/secondary/view-model/usePublicBadgeVM";
@@ -14,11 +15,9 @@ export function PublicBadgePage({ badgeToken }: Props) {
 	const vm = usePublicBadgeVM(badgeToken);
 	const router = useRouter();
 	const returnTo = `/b/${badgeToken}`;
-	const feedbackMessage = vm.connectionAdded
-		? "Contact ajoute"
-		: vm.alreadyConnected
-			? "Deja dans vos contacts"
-			: "";
+	const contactsHref = vm.identity ? `/dashboard/${vm.identity.profileId}/contacts` : "";
+	const dashboardHref = vm.identity ? `/dashboard/${vm.identity.profileId}` : "";
+	const showPostSuccessActions = Boolean(vm.identity && (vm.connectionAdded || vm.alreadyConnected));
 
 	if (vm.loading) {
 		return <main className="mx-auto max-w-md p-4">Chargement...</main>;
@@ -53,9 +52,17 @@ export function PublicBadgePage({ badgeToken }: Props) {
 											: "Ajouter ce contact"}
 							</Button>
 
-							{feedbackMessage ? (
-								<div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-center text-sm font-medium text-green-700">
-									{feedbackMessage}
+							{showPostSuccessActions ? (
+								<div className="space-y-2">
+									<Link
+										className="block rounded-xl border border-black bg-black px-4 py-3 text-center text-sm font-medium text-white"
+										href={contactsHref}
+									>
+										Voir mes contacts
+									</Link>
+									<Link className="block text-center text-sm text-neutral-500 underline" href={dashboardHref}>
+										Retour au dashboard
+									</Link>
 								</div>
 							) : null}
 						</div>
