@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { HttpTapProfileGateway } from "@/app/adapters/secondary/gateways/HttpTapProfileGateway";
 import { loadConnections } from "@/app/core-logic/tap-profile/usecases/loadConnections";
+import type { ConnectionSummary } from "@/app/core-logic/tap-profile/types/connection";
 import { loadOwnerDashboard } from "@/app/core-logic/tap-profile/usecases/loadOwnerDashboard";
 import { loadProfileBadge } from "@/app/core-logic/tap-profile/usecases/loadProfileBadge";
 import type { ProfileBadge } from "@/app/core-logic/tap-profile/types/profile";
@@ -12,27 +13,17 @@ export function useOwnerDashboardVM(profileId: string) {
   const gateway = useMemo(() => new HttpTapProfileGateway(), []);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [connectionsError, setConnectionsError] = useState("");
   const [dashboard, setDashboard] = useState<OwnerDashboard | null>(null);
   const [badge, setBadge] = useState<ProfileBadge | null>(null);
-  const [connections, setConnections] = useState<
-    Array<{
-      connectionId: string;
-      connectedProfile: {
-        profileId: string;
-        slug: string;
-        displayName: string;
-        headline: string;
-        role: "EXHIBITOR" | "VISITOR";
-      };
-      createdAt: string;
-    }>
-  >([]);
+  const [connections, setConnections] = useState<ConnectionSummary[]>([]);
 
   useEffect(() => {
     let active = true;
 
     setLoading(true);
     setError("");
+    setConnectionsError("");
     setDashboard(null);
     setBadge(null);
     setConnections([]);
@@ -52,16 +43,16 @@ export function useOwnerDashboardVM(profileId: string) {
         return;
       }
 
-      if (!connectionsResult.ok) {
-        const failure = connectionsResult.error;
-        setError(failure === "PROFILE_NOT_FOUND" ? "Profil introuvable." : "Une erreur est survenue.");
-        setLoading(false);
-        return;
-      }
-
       setDashboard(dashboardResult.value);
-      setConnections(connectionsResult.value.connections ?? []);
       setBadge(badgeResult.ok ? badgeResult.value : null);
+      setConnections(connectionsResult.ok ? connectionsResult.value ?? [] : []);
+      setConnectionsError(
+        connectionsResult.ok
+          ? ""
+          : connectionsResult.error === "PROFILE_NOT_FOUND"
+            ? "Profil introuvable."
+            : "Impossible de charger les connexions pour le moment.",
+      );
       setLoading(false);
     })();
 
@@ -70,5 +61,5 @@ export function useOwnerDashboardVM(profileId: string) {
     };
   }, [gateway, profileId]);
 
-  return { loading, error, dashboard, badge, connections };
+  return { loading, error, connectionsError, dashboard, badge, connections };
 }

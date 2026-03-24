@@ -149,26 +149,22 @@ describe("HttpTapProfileGateway", () => {
 	it("loads the profile connections", async () => {
 		vi.spyOn(global, "fetch").mockResolvedValue(
 			new Response(
-				JSON.stringify({
-					profile: {
+				JSON.stringify([
+					{
 						profileId: "profile-1",
-						slug: "alex-martin",
 						displayName: "Alex Martin",
+						headline: "Backend developer",
+						role: "EXHIBITOR",
+						createdAt: "2026-03-21T09:00:00Z",
 					},
-					connections: [
-						{
-							connectionId: "connection-1",
-							connectedProfile: {
-								profileId: "profile-2",
-								slug: "nina-rossi",
-								displayName: "Nina Rossi",
-								headline: "Product designer",
-								role: "VISITOR",
-							},
-							createdAt: "2026-03-21T10:00:00Z",
-						},
-					],
-				}),
+					{
+						profileId: "profile-2",
+						displayName: "Nina Rossi",
+						headline: "Product designer",
+						role: "VISITOR",
+						createdAt: "2026-03-21T10:00:00Z",
+					},
+				]),
 				{ status: 200, headers: { "Content-Type": "application/json" } },
 			),
 		);
@@ -182,26 +178,22 @@ describe("HttpTapProfileGateway", () => {
 		);
 		expect(result).toEqual({
 			ok: true,
-			value: {
-				profile: {
+			value: [
+				{
 					profileId: "profile-1",
-					slug: "alex-martin",
 					displayName: "Alex Martin",
+					headline: "Backend developer",
+					role: "EXHIBITOR",
+					createdAt: "2026-03-21T09:00:00Z",
 				},
-				connections: [
-					{
-						connectionId: "connection-1",
-						connectedProfile: {
-							profileId: "profile-2",
-							slug: "nina-rossi",
-							displayName: "Nina Rossi",
-							headline: "Product designer",
-							role: "VISITOR",
-						},
-						createdAt: "2026-03-21T10:00:00Z",
-					},
-				],
-			},
+				{
+					profileId: "profile-2",
+					displayName: "Nina Rossi",
+					headline: "Product designer",
+					role: "VISITOR",
+					createdAt: "2026-03-21T10:00:00Z",
+				},
+			],
 		});
 	});
 });

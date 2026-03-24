@@ -11,6 +11,7 @@ import type {
 	LeadCaptureSuccess,
 	LeadInput,
 } from "@/app/core-logic/tap-profile/types/lead";
+import type { ConnectionSummary } from "@/app/core-logic/tap-profile/types/connection";
 import type { OwnerDashboard } from "@/app/core-logic/tap-profile/types/stats";
 import type { Result } from "@/app/lib/result";
 
@@ -44,26 +45,6 @@ export interface TapProfileGateway {
 		>
 	>;
 	getConnections(profileId: string): Promise<
-		Result<
-			{
-				profile: {
-					profileId: string;
-					slug: string;
-					displayName: string;
-				};
-				connections: Array<{
-					connectionId: string;
-					connectedProfile: {
-						profileId: string;
-						slug: string;
-						displayName: string;
-						headline: string;
-						role: "EXHIBITOR" | "VISITOR";
-					};
-					createdAt: string;
-				}>;
-			},
-			"PROFILE_NOT_FOUND" | "UNKNOWN_ERROR"
-		>
+		Result<ConnectionSummary[], "PROFILE_NOT_FOUND" | "UNKNOWN_ERROR">
 	>;
 }

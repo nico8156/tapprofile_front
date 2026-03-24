@@ -1,4 +1,5 @@
 import type { TapProfileGateway } from "@/app/core-logic/tap-profile/gateway/tapProfile.gateway";
+import type { ConnectionSummary } from "@/app/core-logic/tap-profile/types/connection";
 import type { LeadInput } from "@/app/core-logic/tap-profile/types/lead";
 import { env } from "@/app/lib/env";
 import { err, ok } from "@/app/lib/result";
@@ -74,24 +75,13 @@ type CreateConnectionHttpResponse = {
 	createdAt: string;
 };
 
-type ConnectionsHttpResponse = {
-	profile: {
-		profileId: string;
-		slug: string;
-		displayName: string;
-	};
-	connections: Array<{
-		connectionId: string;
-		connectedProfile: {
-			profileId: string;
-			slug: string;
-			displayName: string;
-			headline: string;
-			role: "EXHIBITOR" | "VISITOR";
-		};
-		createdAt: string;
-	}>;
-};
+type ConnectionsHttpResponse = Array<{
+	profileId?: string;
+	displayName?: string;
+	headline?: string;
+	role?: "EXHIBITOR" | "VISITOR";
+	createdAt?: string;
+}>;
 
 export class HttpTapProfileGateway implements TapProfileGateway {
 	async loadPublicProfile(slug: string) {
@@ -326,7 +316,17 @@ export class HttpTapProfileGateway implements TapProfileGateway {
 			if (!response.ok) return err("UNKNOWN_ERROR" as const);
 
 			const json = (await response.json()) as ConnectionsHttpResponse;
-			return ok(json);
+			const connections: ConnectionSummary[] = Array.isArray(json)
+				? json.map((connection) => ({
+						profileId: connection.profileId ?? "",
+						displayName: connection.displayName ?? "",
+						headline: connection.headline ?? "",
+						role: connection.role === "VISITOR" ? "VISITOR" : "EXHIBITOR",
+						createdAt: connection.createdAt ?? "",
+					}))
+				: [];
+
+			return ok(connections);
 		} catch {
 			return err("UNKNOWN_ERROR" as const);
 		}
