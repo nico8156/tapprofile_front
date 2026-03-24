@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { HttpTapProfileGateway } from "@/app/adapters/secondary/gateways/HttpTapProfileGateway";
+import { loadConnections } from "@/app/core-logic/tap-profile/usecases/loadConnections";
 import { loadOwnerDashboard } from "@/app/core-logic/tap-profile/usecases/loadOwnerDashboard";
 import { loadProfileBadge } from "@/app/core-logic/tap-profile/usecases/loadProfileBadge";
 import type { ProfileBadge } from "@/app/core-logic/tap-profile/types/profile";
@@ -13,6 +14,19 @@ export function useOwnerDashboardVM(profileId: string) {
   const [error, setError] = useState("");
   const [dashboard, setDashboard] = useState<OwnerDashboard | null>(null);
   const [badge, setBadge] = useState<ProfileBadge | null>(null);
+  const [connections, setConnections] = useState<
+    Array<{
+      connectionId: string;
+      connectedProfile: {
+        profileId: string;
+        slug: string;
+        displayName: string;
+        headline: string;
+        role: "EXHIBITOR" | "VISITOR";
+      };
+      createdAt: string;
+    }>
+  >([]);
 
   useEffect(() => {
     let active = true;
@@ -21,24 +35,32 @@ export function useOwnerDashboardVM(profileId: string) {
     setError("");
     setDashboard(null);
     setBadge(null);
+    setConnections([]);
 
     (async () => {
-      const result = await loadOwnerDashboard(gateway)(profileId);
+      const [dashboardResult, badgeResult, connectionsResult] = await Promise.all([
+        loadOwnerDashboard(gateway)(profileId),
+        loadProfileBadge(gateway)(profileId),
+        loadConnections(gateway)(profileId),
+      ]);
 
       if (!active) return;
 
-      if (!result.ok) {
-        setError(result.error === "PROFILE_NOT_FOUND" ? "Profil introuvable." : "Une erreur est survenue.");
+      if (!dashboardResult.ok) {
+        setError(dashboardResult.error === "PROFILE_NOT_FOUND" ? "Profil introuvable." : "Une erreur est survenue.");
         setLoading(false);
         return;
       }
 
-      setDashboard(result.value);
+      if (!connectionsResult.ok) {
+        const failure = connectionsResult.error;
+        setError(failure === "PROFILE_NOT_FOUND" ? "Profil introuvable." : "Une erreur est survenue.");
+        setLoading(false);
+        return;
+      }
 
-      const badgeResult = await loadProfileBadge(gateway)(profileId);
-
-      if (!active) return;
-
+      setDashboard(dashboardResult.value);
+      setConnections(connectionsResult.value.connections ?? []);
       setBadge(badgeResult.ok ? badgeResult.value : null);
       setLoading(false);
     })();
@@ -48,5 +70,5 @@ export function useOwnerDashboardVM(profileId: string) {
     };
   }, [gateway, profileId]);
 
-  return { loading, error, dashboard, badge };
+  return { loading, error, dashboard, badge, connections };
 }

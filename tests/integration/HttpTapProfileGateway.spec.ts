@@ -145,4 +145,63 @@ describe("HttpTapProfileGateway", () => {
 			},
 		});
 	});
+
+	it("loads the profile connections", async () => {
+		vi.spyOn(global, "fetch").mockResolvedValue(
+			new Response(
+				JSON.stringify({
+					profile: {
+						profileId: "profile-1",
+						slug: "alex-martin",
+						displayName: "Alex Martin",
+					},
+					connections: [
+						{
+							connectionId: "connection-1",
+							connectedProfile: {
+								profileId: "profile-2",
+								slug: "nina-rossi",
+								displayName: "Nina Rossi",
+								headline: "Product designer",
+								role: "VISITOR",
+							},
+							createdAt: "2026-03-21T10:00:00Z",
+						},
+					],
+				}),
+				{ status: 200, headers: { "Content-Type": "application/json" } },
+			),
+		);
+
+		const gateway = new HttpTapProfileGateway();
+		const result = await gateway.getConnections("profile-1");
+
+		expect(fetch).toHaveBeenCalledWith(
+			expect.stringContaining("/api/profiles/profile-1/connections"),
+			expect.objectContaining({ method: "GET" }),
+		);
+		expect(result).toEqual({
+			ok: true,
+			value: {
+				profile: {
+					profileId: "profile-1",
+					slug: "alex-martin",
+					displayName: "Alex Martin",
+				},
+				connections: [
+					{
+						connectionId: "connection-1",
+						connectedProfile: {
+							profileId: "profile-2",
+							slug: "nina-rossi",
+							displayName: "Nina Rossi",
+							headline: "Product designer",
+							role: "VISITOR",
+						},
+						createdAt: "2026-03-21T10:00:00Z",
+					},
+				],
+			},
+		});
+	});
 });

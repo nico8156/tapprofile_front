@@ -22,7 +22,7 @@ export function OwnerDashboardPage({ profileId }: Props) {
 
   const dashboard = vm.dashboard;
   const badgeUrl = vm.badge?.publicBadgeUrl ?? "";
-  const recentLeads = dashboard.recentLeads ?? [];
+  const recentConnections = (vm.connections ?? []).slice(0, 5);
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-4 p-4">
@@ -63,21 +63,28 @@ export function OwnerDashboardPage({ profileId }: Props) {
       </Card>
 
       <Card>
-        <h2 className="mb-3 text-lg font-semibold">Leads recents</h2>
+        <h2 className="mb-3 text-lg font-semibold">Connexions récentes</h2>
 
-        {recentLeads.length === 0 ? (
-          <p className="text-sm text-neutral-500">Aucun lead pour le moment.</p>
+        {recentConnections.length === 0 ? (
+          <p className="text-sm text-neutral-500">Aucune connexion pour le moment.</p>
         ) : (
           <div className="space-y-3">
-            {recentLeads.map((lead, index) => (
+            {recentConnections.map((connection) => (
               <div
-                key={lead.leadId ?? `${lead.email ?? "lead"}-${index}`}
+                key={connection.connectionId}
                 className="rounded-xl border border-neutral-200 p-3"
               >
-                <div className="font-medium">{lead.firstName || "Lead sans nom"}</div>
-                {lead.email ? <div className="text-sm text-neutral-600">{lead.email}</div> : null}
-                {lead.message ? <div className="mt-2 text-sm text-neutral-600">{lead.message}</div> : null}
-                {lead.createdAt ? <div className="mt-1 text-xs text-neutral-400">{lead.createdAt}</div> : null}
+                <div className="font-medium">
+                  {connection.connectedProfile.displayName || "Connexion sans nom"}
+                </div>
+                {connection.connectedProfile.headline ? (
+                  <div className="text-sm text-neutral-600">{connection.connectedProfile.headline}</div>
+                ) : null}
+                <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-neutral-500">
+                  <span>@{connection.connectedProfile.slug}</span>
+                  <span>{connection.connectedProfile.role}</span>
+                  <span>{connection.createdAt}</span>
+                </div>
               </div>
             ))}
           </div>
