@@ -15,4 +15,27 @@ describe("ProductLandingPage", () => {
 		expect(screen.getByText("Trois etapes, rien de plus")).toBeTruthy();
 		expect(screen.getByText("Meetups")).toBeTruthy();
 	});
+
+	it("renders the pain-driven variant", () => {
+		render(<ProductLandingPage variant="pain" />);
+
+		expect(screen.getByText("Vous perdez vos contacts apres chaque meetup ?")).toBeTruthy();
+		expect(
+			screen.getByText("Cartes de visite oubliees, LinkedIn jamais retrouves. Gardez chaque contact en un scan."),
+		).toBeTruthy();
+		expect(screen.getByText("Ce qui se passe aujourd'hui")).toBeTruthy();
+		expect(screen.getAllByText("Vous oubliez les noms").length).toBeGreaterThan(0);
+		expect(screen.getByText("TapProfile remplace les oublis par une action claire")).toBeTruthy();
+		expect(screen.getAllByText("Garder mes contacts").length).toBeGreaterThan(0);
+	});
+
+	it("renders the outcome-driven variant", () => {
+		render(<ProductLandingPage variant="outcome" />);
+
+		expect(screen.getByText("Un scan. Et le contact est enregistre.")).toBeTruthy();
+		expect(screen.getByText("Pas de carte de visite. Pas d'effort. Juste une connexion instantanee.")).toBeTruthy();
+		expect(screen.getByText("Imaginez un meetup")).toBeTruthy();
+		expect(screen.getAllByText("Vous discutez").length).toBeGreaterThan(0);
+		expect(screen.getByText("Zero carte de visite")).toBeTruthy();
+	});
 });
