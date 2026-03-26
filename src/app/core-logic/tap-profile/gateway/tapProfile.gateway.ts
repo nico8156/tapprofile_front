@@ -24,10 +24,31 @@ export interface TapProfileGateway {
 	createProfile(input: {
 		slug: string;
 		displayName: string;
+		email: string;
 		headline: string;
 		bio: string;
-		role: ProfileRole;
+		role?: ProfileRole;
 	}): Promise<Result<{ profileId: string }, "UNKNOWN_ERROR">>;
+	requestMagicLink(input: {
+		profileId: string;
+		email: string;
+	}): Promise<Result<void, "INVALID_EMAIL" | "UNKNOWN_ERROR">>;
+	consumeMagicLink(token: string): Promise<
+		Result<
+			{
+				profile: {
+					profileId: string;
+					slug: string;
+					displayName: string;
+					email: string;
+					role: ProfileRole;
+					status: string;
+				};
+				contacts: ConnectionSummary[];
+			},
+			"MAGIC_LINK_INVALID_OR_EXPIRED" | "UNKNOWN_ERROR"
+		>
+	>;
 	publishProfile(profileId: string): Promise<Result<void, "UNKNOWN_ERROR">>;
 	getProfileBadge(profileId: string): Promise<Result<ProfileBadge, "PROFILE_NOT_FOUND" | "UNKNOWN_ERROR">>;
 	createConnection(input: {

@@ -28,6 +28,7 @@ export function useCreateProfileVM() {
 		const firstName = input.firstName.trim();
 		const lastName = input.lastName.trim();
 		const displayName = `${firstName} ${lastName}`.trim();
+		const email = input.email.trim().toLowerCase();
 		const organization = input.organization.trim();
 		const role = input.role;
 		const headline = organization || (role === "EXHIBITOR" ? "Exposant" : "Participant");
@@ -39,7 +40,9 @@ export function useCreateProfileVM() {
 		const createResult = await createProfile(gateway)({
 			slug,
 			displayName,
+			email,
 			headline,
+			bio: "",
 			role,
 		});
 
@@ -69,6 +72,11 @@ export function useCreateProfileVM() {
 			profileId: createResult.value.profileId,
 			slug,
 			role,
+		});
+
+		void gateway.requestMagicLink({
+			profileId: createResult.value.profileId,
+			email,
 		});
 
 		setError("");

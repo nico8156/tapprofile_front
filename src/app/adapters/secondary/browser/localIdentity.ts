@@ -8,6 +8,9 @@ export type LocalIdentity = {
 	profileId: string;
 	slug: string;
 	role: ProfileRole;
+	displayName?: string;
+	email?: string;
+	status?: string;
 };
 
 export function storeLocalIdentity(identity: LocalIdentity) {
@@ -25,7 +28,10 @@ export function readLocalIdentity(): LocalIdentity | null {
 		if (
 			typeof parsed.profileId !== "string" ||
 			typeof parsed.slug !== "string" ||
-			(parsed.role !== "EXHIBITOR" && parsed.role !== "VISITOR")
+			(parsed.role !== "EXHIBITOR" && parsed.role !== "VISITOR") ||
+			(parsed.displayName !== undefined && typeof parsed.displayName !== "string") ||
+			(parsed.email !== undefined && typeof parsed.email !== "string") ||
+			(parsed.status !== undefined && typeof parsed.status !== "string")
 		) {
 			return null;
 		}
@@ -34,6 +40,9 @@ export function readLocalIdentity(): LocalIdentity | null {
 			profileId: parsed.profileId,
 			slug: parsed.slug,
 			role: parsed.role,
+			displayName: parsed.displayName,
+			email: parsed.email,
+			status: parsed.status,
 		};
 	} catch {
 		return null;

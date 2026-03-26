@@ -16,12 +16,18 @@ describe("localIdentity", () => {
 			profileId: "profile-1",
 			slug: "alex-martin",
 			role: "EXHIBITOR",
+			displayName: "Alex Martin",
+			email: "alex@example.com",
+			status: "PUBLISHED",
 		});
 
 		expect(readLocalIdentity()).toEqual({
 			profileId: "profile-1",
 			slug: "alex-martin",
 			role: "EXHIBITOR",
+			displayName: "Alex Martin",
+			email: "alex@example.com",
+			status: "PUBLISHED",
 		});
 	});
 

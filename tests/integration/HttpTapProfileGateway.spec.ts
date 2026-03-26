@@ -196,4 +196,125 @@ describe("HttpTapProfileGateway", () => {
 			],
 		});
 	});
+
+	it("requests a magic link email for a profile", async () => {
+		vi.spyOn(global, "fetch").mockResolvedValue(new Response(null, { status: 204 }));
+
+		const gateway = new HttpTapProfileGateway();
+		const result = await gateway.requestMagicLink({
+			profileId: "profile-1",
+			email: "lea@example.com",
+		});
+
+		expect(fetch).toHaveBeenCalledWith(
+			expect.stringContaining("/api/profiles/profile-1/magic-link"),
+			expect.objectContaining({
+				method: "POST",
+				body: JSON.stringify({
+					email: "lea@example.com",
+				}),
+			}),
+		);
+		expect(result).toEqual({
+			ok: true,
+			value: undefined,
+		});
+	});
+
+	it("creates a profile with the backend payload contract", async () => {
+		vi.spyOn(global, "fetch").mockResolvedValue(
+			new Response(JSON.stringify({ profileId: "profile-1" }), {
+				status: 200,
+				headers: { "Content-Type": "application/json" },
+			}),
+		);
+
+		const gateway = new HttpTapProfileGateway();
+		const result = await gateway.createProfile({
+			slug: "lea-martin",
+			displayName: "Lea Martin",
+			email: "lea@example.com",
+			headline: "Participant",
+			bio: "",
+			role: "VISITOR",
+		});
+
+		expect(fetch).toHaveBeenCalledWith(
+			expect.stringContaining("/api/profiles"),
+			expect.objectContaining({
+				method: "POST",
+				body: JSON.stringify({
+					slug: "lea-martin",
+					displayName: "Lea Martin",
+					email: "lea@example.com",
+					headline: "Participant",
+					bio: "",
+					role: "VISITOR",
+				}),
+			}),
+		);
+		expect(result).toEqual({
+			ok: true,
+			value: {
+				profileId: "profile-1",
+			},
+		});
+	});
+
+	it("hydrates a local identity from a magic link token", async () => {
+		vi.spyOn(global, "fetch").mockResolvedValue(
+			new Response(
+				JSON.stringify({
+					profile: {
+						profileId: "profile-1",
+						slug: "lea-martin",
+						displayName: "Lea Martin",
+						email: "lea@example.com",
+						role: "VISITOR",
+						status: "PUBLISHED",
+					},
+					contacts: [
+						{
+							profileId: "profile-2",
+							displayName: "Nina Rossi",
+							headline: "Product designer",
+							role: "EXHIBITOR",
+							createdAt: "2026-03-21T10:00:00Z",
+						},
+					],
+				}),
+				{ status: 200, headers: { "Content-Type": "application/json" } },
+			),
+		);
+
+		const gateway = new HttpTapProfileGateway();
+		const result = await gateway.consumeMagicLink("token-1");
+
+		expect(fetch).toHaveBeenCalledWith(
+			expect.stringContaining("/api/magic-link/token-1"),
+			expect.objectContaining({ method: "GET" }),
+		);
+		expect(result).toEqual({
+			ok: true,
+			value: {
+				profile: {
+					profileId: "profile-1",
+					slug: "lea-martin",
+					displayName: "Lea Martin",
+					email: "lea@example.com",
+					role: "VISITOR",
+					status: "PUBLISHED",
+				},
+				contacts: [
+					{
+						profileId: "profile-2",
+						displayName: "Nina Rossi",
+						headline: "Product designer",
+						role: "EXHIBITOR",
+						createdAt: "2026-03-21T10:00:00Z",
+					},
+				],
+			},
+		});
+	});
 });

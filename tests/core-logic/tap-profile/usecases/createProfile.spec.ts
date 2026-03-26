@@ -13,13 +13,15 @@ describe("normalizeProfileSlug", () => {
 });
 
 describe("createProfile", () => {
-	it("rejects empty display name", async () => {
+	it("rejects missing required fields", async () => {
 		const gateway = {
 			createProfile: vi.fn(),
 		} as any;
 
 		const result = await createProfile(gateway)({
 			displayName: "   ",
+			email: "lea@example.com",
+			headline: "Participant",
 			role: "VISITOR",
 		});
 
@@ -34,14 +36,17 @@ describe("createProfile", () => {
 
 		const result = await createProfile(gateway)({
 			displayName: " Alex Martin ",
-			headline: " Backend developer ",
+			email: " LEA@STARTUP.FR ",
+			headline: " Startup ",
+			bio: " ",
 			role: "EXHIBITOR",
 		});
 
 		expect(gateway.createProfile).toHaveBeenCalledWith({
 			slug: "alex-martin",
 			displayName: "Alex Martin",
-			headline: "Backend developer",
+			email: "lea@startup.fr",
+			headline: "Startup",
 			bio: "",
 			role: "EXHIBITOR",
 		});

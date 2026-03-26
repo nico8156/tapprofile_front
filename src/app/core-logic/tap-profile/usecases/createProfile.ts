@@ -12,26 +12,31 @@ export const normalizeProfileSlug = (value: string) =>
 		.replace(/^-+|-+$/g, "");
 
 export const createProfile =
-  (gateway: TapProfileGateway) =>
-  async (input: {
-    slug?: string;
-    displayName: string;
-    headline?: string;
-    bio?: string;
-    role: ProfileRole;
-  }) => {
-    const displayName = input.displayName.trim();
-    const slug = normalizeProfileSlug(input.slug?.trim() || displayName);
+	(gateway: TapProfileGateway) =>
+	async (input: {
+		slug?: string;
+		displayName: string;
+		email: string;
+		headline?: string;
+		bio?: string;
+		role?: ProfileRole;
+	}) => {
+		const displayName = input.displayName.trim();
+		const slug = normalizeProfileSlug(input.slug?.trim() || displayName);
+		const email = input.email.trim().toLowerCase();
+		const headline = input.headline?.trim() || "";
+		const bio = input.bio?.trim() || "";
 
-    if (!displayName || !slug) {
-      return err("INVALID_PROFILE" as const);
-    }
+		if (!displayName || !slug || !email || !headline) {
+			return err("INVALID_PROFILE" as const);
+		}
 
-    return gateway.createProfile({
-      slug,
-      displayName,
-      headline: input.headline?.trim() || "",
-      bio: input.bio?.trim() || "",
-      role: input.role,
-    });
-  };
+		return gateway.createProfile({
+			slug,
+			displayName,
+			email,
+			headline,
+			bio,
+			role: input.role,
+		});
+	};

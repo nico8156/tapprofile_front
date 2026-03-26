@@ -55,13 +55,32 @@ type ProfileBadgeHttpResponse = {
 type CreateProfileInput = {
 	slug: string;
 	displayName: string;
+	email: string;
 	headline: string;
 	bio: string;
-	role: "EXHIBITOR" | "VISITOR";
+	role?: "EXHIBITOR" | "VISITOR";
 };
 
 type CreateProfileHttpResponse = {
 	profileId: string;
+};
+
+type MagicLinkHttpResponse = {
+	profile?: {
+		profileId?: string;
+		slug?: string;
+		displayName?: string;
+		email?: string;
+		role?: "EXHIBITOR" | "VISITOR";
+		status?: string;
+	};
+	contacts?: Array<{
+		profileId?: string;
+		displayName?: string;
+		headline?: string;
+		role?: "EXHIBITOR" | "VISITOR";
+		createdAt?: string;
+	}>;
 };
 
 type CaptureLeadHttpResponse = {
@@ -244,6 +263,98 @@ export class HttpTapProfileGateway implements TapProfileGateway {
 		}
 	}
 
+	async requestMagicLink(input: { profileId: string; email: string }) {
+		try {
+			const response = await fetch(`${env.apiBaseUrl}/api/profiles/${input.profileId}/magic-link`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					email: input.email,
+				}),
+			});
+
+			if (response.status === 400) {
+				const errors = await readApiErrors(response);
+
+				if (errors.some((error) => error.field === "email")) {
+					return err("INVALID_EMAIL" as const);
+				}
+			}
+
+			if (!response.ok) return err("UNKNOWN_ERROR" as const);
+
+			return ok(undefined);
+		} catch {
+			return err("UNKNOWN_ERROR" as const);
+		}
+	}
+
+	async consumeMagicLink(token: string) {
+		try {
+			const response = await fetch(`${env.apiBaseUrl}/api/magic-link/${token}`, {
+				method: "GET",
+				headers: { "Content-Type": "application/json" },
+				cache: "no-store",
+			});
+
+			if (response.status === 400 || response.status === 404) {
+				return err("MAGIC_LINK_INVALID_OR_EXPIRED" as const);
+			}
+
+			if (!response.ok) return err("UNKNOWN_ERROR" as const);
+
+			const json = (await response.json()) as MagicLinkHttpResponse;
+			const profile = json.profile;
+			const contacts = Array.isArray(json.contacts) ? json.contacts : [];
+
+			if (
+				!profile ||
+				typeof profile.profileId !== "string" ||
+				typeof profile.slug !== "string" ||
+				typeof profile.displayName !== "string" ||
+				typeof profile.email !== "string" ||
+				(profile.role !== "EXHIBITOR" && profile.role !== "VISITOR") ||
+				typeof profile.status !== "string"
+			) {
+				return err("UNKNOWN_ERROR" as const);
+			}
+
+			return ok({
+				profile: {
+					profileId: profile.profileId,
+					slug: profile.slug,
+					displayName: profile.displayName,
+					email: profile.email,
+					role: profile.role,
+					status: profile.status,
+				},
+				contacts: contacts.flatMap((contact) => {
+					if (
+						typeof contact.profileId !== "string" ||
+						typeof contact.displayName !== "string" ||
+						typeof contact.headline !== "string" ||
+						(contact.role !== "EXHIBITOR" && contact.role !== "VISITOR") ||
+						typeof contact.createdAt !== "string"
+					) {
+						return [];
+					}
+
+					return [
+						{
+							profileId: contact.profileId,
+							displayName: contact.displayName,
+							headline: contact.headline,
+							role: contact.role,
+							createdAt: contact.createdAt,
+						},
+					];
+				}),
+			});
+		} catch {
+			return err("UNKNOWN_ERROR" as const);
+		}
+	}
+
 	async publishProfile(profileId: string) {
 		try {
 			const response = await fetch(`${env.apiBaseUrl}/api/profiles/${profileId}/publish`, {
@@ -318,12 +429,12 @@ export class HttpTapProfileGateway implements TapProfileGateway {
 			const json = (await response.json()) as ConnectionsHttpResponse;
 			const connections: ConnectionSummary[] = Array.isArray(json)
 				? json.map((connection) => ({
-						profileId: connection.profileId ?? "",
-						displayName: connection.displayName ?? "",
-						headline: connection.headline ?? "",
-						role: connection.role === "VISITOR" ? "VISITOR" : "EXHIBITOR",
-						createdAt: connection.createdAt ?? "",
-					}))
+					profileId: connection.profileId ?? "",
+					displayName: connection.displayName ?? "",
+					headline: connection.headline ?? "",
+					role: connection.role === "VISITOR" ? "VISITOR" : "EXHIBITOR",
+					createdAt: connection.createdAt ?? "",
+				}))
 				: [];
 
 			return ok(connections);
