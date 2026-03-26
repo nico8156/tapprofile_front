@@ -19,15 +19,15 @@ const roleStyles: Record<
   }
 > = {
   VISITOR: {
-    badge: "border-neutral-900/10 bg-neutral-950 text-white shadow-[0_10px_24px_rgba(15,23,42,0.18)]",
+    badge: "border-neutral-900/12 bg-neutral-900 text-white shadow-[0_8px_20px_rgba(15,23,42,0.14)]",
     dot: "bg-white/90",
   },
   EXHIBITOR: {
-    badge: "border-amber-300/80 bg-amber-400 text-amber-950 shadow-[0_10px_24px_rgba(217,119,6,0.22)]",
+    badge: "border-amber-300/80 bg-amber-300 text-amber-950 shadow-[0_8px_20px_rgba(217,119,6,0.16)]",
     dot: "bg-amber-950",
   },
   STAFF: {
-    badge: "border-sky-300/80 bg-sky-500 text-white shadow-[0_10px_24px_rgba(14,165,233,0.24)]",
+    badge: "border-sky-300/80 bg-sky-500 text-white shadow-[0_8px_20px_rgba(14,165,233,0.18)]",
     dot: "bg-white/90",
   },
 };
@@ -70,62 +70,50 @@ export function Badge({ displayName, organization, role, eventName, qrValue }: P
 
       <div className="flex flex-col items-center text-center">
         {eventName ? (
-          <p className="text-sm font-semibold tracking-[0.14em] text-neutral-500 uppercase">{eventName}</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-neutral-500">{eventName}</p>
         ) : null}
 
-        <div className={`${eventName ? "mt-4" : ""}`}>
+        <div className={eventName ? "mt-3" : ""}>
           <span
-            className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-bold tracking-[0.22em] ${roleStyle.badge}`}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-bold tracking-[0.18em] ${roleStyle.badge}`}
           >
-            <span className={`h-2 w-2 rounded-full ${roleStyle.dot}`} />
+            <span className={`h-1.5 w-1.5 rounded-full ${roleStyle.dot}`} />
             {role}
           </span>
         </div>
 
-        <div className="mt-5 flex w-full flex-col items-center">
-          <h1 className="max-w-[10ch] text-balance text-[2.9rem] font-black leading-[0.92] tracking-[-0.07em] text-neutral-950 sm:text-[3.2rem]">
+        <div className="mt-4 flex w-full flex-col items-center">
+          <h1 className="max-w-[10ch] text-balance text-[2.9rem] font-black leading-[0.95] tracking-[-0.06em] text-neutral-950 sm:text-[3.2rem]">
             {displayName}
           </h1>
 
           {organization ? (
-            <p className="mt-3 max-w-[20ch] text-sm font-semibold tracking-[0.04em] text-neutral-600 sm:text-base">
+            <p className="mt-2.5 max-w-[20ch] text-sm font-semibold tracking-[0.04em] text-neutral-600 sm:text-base">
               {organization}
             </p>
           ) : null}
         </div>
 
-        <div className="mt-6 w-full rounded-[1.9rem] border border-neutral-200 bg-neutral-950 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] sm:px-5 sm:py-5">
-          <div className="mb-3 flex items-center justify-between gap-3 text-left">
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-white/55">Code contact</p>
-              <p className="mt-1 text-sm font-medium text-white/80">Montrez ce QR pour echanger vite</p>
-            </div>
-            <div className="h-px flex-1 bg-white/12" />
+        <div className="mt-5 w-full rounded-[1.7rem] border border-neutral-200 bg-[#111111] px-3.5 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] sm:px-4 sm:py-4">
+          <div className="mb-2.5 text-left">
+            <p className="text-sm font-medium text-white/82">Scannez pour echanger</p>
           </div>
 
-          <div className="rounded-[1.6rem] bg-white p-3 shadow-[0_14px_30px_rgba(15,23,42,0.22)] sm:p-4">
-            <div className="flex justify-center rounded-[1.35rem] bg-white">
+          <div className="rounded-[1.45rem] bg-white p-3 shadow-[0_12px_26px_rgba(15,23,42,0.18)] sm:p-3.5">
+            <div className="flex justify-center rounded-[1.2rem] bg-white">
               {src ? (
                 <img
                   src={src}
                   alt={`QR code pour ${displayName}`}
-                  className="h-52 w-52 rounded-[1.2rem] bg-white object-contain sm:h-56 sm:w-56"
+                  className="h-52 w-52 rounded-[1.1rem] bg-white object-contain sm:h-56 sm:w-56"
                 />
               ) : (
-                <div className="flex h-52 w-52 items-center justify-center rounded-[1.2rem] border border-neutral-200 bg-white text-sm text-neutral-500 sm:h-56 sm:w-56">
+                <div className="flex h-52 w-52 items-center justify-center rounded-[1.1rem] border border-neutral-200 bg-white text-sm text-neutral-500 sm:h-56 sm:w-56">
                   QR code...
                 </div>
               )}
             </div>
           </div>
-        </div>
-
-        <div className="mt-5 flex w-full items-center justify-center gap-3">
-          <div className="h-px w-10 bg-neutral-300" />
-          <p className="text-sm font-semibold tracking-[0.02em] text-neutral-800">
-            Scannez pour echanger
-          </p>
-          <div className="h-px w-10 bg-neutral-300" />
         </div>
       </div>
     </article>
